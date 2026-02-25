@@ -8,20 +8,19 @@ app = Flask(__name__)
 import base64
 
 def get_token():
-    credentials = f"{config.CLIENT_ID}:{config.CLIENT_SECRET}"
-    encoded_credentials = base64.b64encode(credentials.encode()).decode()
+    creds = f"{config.CLIENT_ID}:{config.CLIENT_SECRET}"
+    b64 = base64.b64encode(creds.encode()).decode()
 
     headers = {
-        "Authorization": f"Basic {encoded_credentials}",
+        "Authorization": f"Basic {b64}",
         "Content-Type": "application/x-www-form-urlencoded"
     }
 
-    data = {
-        "grant_type": "client_credentials"
-    }
+    body = "grant_type=client_credentials"
 
-    r = requests.post(config.TOKEN_URL, headers=headers, data=data)
+    r = requests.post(config.TOKEN_URL, headers=headers, data=body)
     r.raise_for_status()
+
     return r.json()["access_token"]
 
 def get_orders():
