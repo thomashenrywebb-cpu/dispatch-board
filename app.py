@@ -5,12 +5,22 @@ import config
 
 app = Flask(__name__)
 
+import base64
+
 def get_token():
-    r = requests.post(config.TOKEN_URL, data={
-        "grant_type": "client_credentials",
-        "client_id": config.CLIENT_ID,
-        "client_secret": config.CLIENT_SECRET
-    })
+    credentials = f"{config.CLIENT_ID}:{config.CLIENT_SECRET}"
+    encoded_credentials = base64.b64encode(credentials.encode()).decode()
+
+    headers = {
+        "Authorization": f"Basic {encoded_credentials}",
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+
+    data = {
+        "grant_type": "client_credentials"
+    }
+
+    r = requests.post(config.TOKEN_URL, headers=headers, data=data)
     r.raise_for_status()
     return r.json()["access_token"]
 
